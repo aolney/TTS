@@ -7,7 +7,6 @@ tensorboardX
 matplotlib==2.0.2
 Pillow
 flask
-lws
 tqdm
 git+git://github.com/bootphon/phonemizer@master
 soundfile
