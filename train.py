@@ -481,6 +481,14 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    #AMO add
+    parser.add_argument(
+        '--force_single_gpu',
+        type=bool,
+        default=True,
+        help='Forces use of single GPU.'
+    )
+    #AMO end add
     parser.add_argument(
         '--restore_path',
         type=str,
@@ -529,6 +537,12 @@ if __name__ == '__main__':
     # setup output paths and read configs
     c = load_config(args.config_path)
     _ = os.path.dirname(os.path.realpath(__file__))
+    # AMO add
+    if args.force_single_gpu == True:
+        num_gpus = 1
+        print(" > Forcing use of single GPU, id: ", torch.cuda.get_device_name(torch.cuda.current_device()))
+    # AMO end add
+    
     if args.data_path != '':
         c.data_path = args.data_path
 

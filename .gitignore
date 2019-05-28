@@ -127,3 +127,9 @@ tests/outputs/*
 TODO.txt
 .vscode/*
 data/*
+
+#AO
+models/*/
+*phonemes/
+config.json.*
+notebooks/.sos/
