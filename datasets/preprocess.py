@@ -92,6 +92,17 @@ def ljspeech(root_path, meta_file):
             items.append([text, wav_file])
     return items
 
+def ljspeech2(root_path, meta_file):
+    """Uses the normalized column of ljspeech (2 -> two)"""
+    txt_file = os.path.join(root_path, meta_file)
+    items = []
+    with open(txt_file, 'r') as ttf:
+        for line in ttf:
+            cols = line.split('|')
+            wav_file = os.path.join(root_path, 'wavs', cols[0] + '.wav')
+            text = cols[2]
+            items.append([text, wav_file])
+    return items
 
 def nancy(root_path, meta_file):
     """Normalizes the Nancy meta data file to TTS format"""

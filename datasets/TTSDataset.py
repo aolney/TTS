@@ -75,7 +75,11 @@ class MyDataset(Dataset):
         self.sort_items()
 
     def load_wav(self, filename):
-        audio = self.ap.load_wav(filename)
+        audio = None
+        try: 
+            audio = self.ap.load_wav(filename)
+        except:
+            print(" > ERROR: " + filename + " cannot be loaded" )
         return audio
 
     def load_np(self, filename):
