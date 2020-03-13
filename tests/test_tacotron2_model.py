@@ -6,9 +6,11 @@ import numpy as np
 
 from torch import optim
 from torch import nn
-from utils.generic_utils import load_config
-from layers.losses import MSELossMasked
-from models.tacotron2 import Tacotron2
+from TTS.utils.generic_utils import load_config
+from TTS.layers.losses import MSELossMasked
+from TTS.models.tacotron2 import Tacotron2
+
+#pylint: disable=unused-variable
 
 torch.manual_seed(1)
 use_cuda = torch.cuda.is_available()
@@ -27,6 +29,7 @@ class TacotronTrainTest(unittest.TestCase):
         mel_postnet_spec = torch.rand(8, 30, c.audio['num_mels']).to(device)
         mel_lengths = torch.randint(20, 30, (8, )).long().to(device)
         stop_targets = torch.zeros(8, 30, 1).float().to(device)
+        speaker_ids = torch.randint(0, 5, (8, )).long().to(device)
 
         for idx in mel_lengths:
             stop_targets[:, int(idx.item()):, 0] = 1.0
@@ -35,9 +38,9 @@ class TacotronTrainTest(unittest.TestCase):
                                          stop_targets.size(1) // c.r, -1)
         stop_targets = (stop_targets.sum(2) > 0.0).unsqueeze(2).float().squeeze()
 
-        criterion = MSELossMasked().to(device)
+        criterion = MSELossMasked(seq_len_norm=False).to(device)
         criterion_st = nn.BCEWithLogitsLoss().to(device)
-        model = Tacotron2(24, c.r).to(device)
+        model = Tacotron2(num_chars=24, r=c.r, num_speakers=5).to(device)
         model.train()
         model_ref = copy.deepcopy(model)
         count = 0
@@ -48,7 +51,7 @@ class TacotronTrainTest(unittest.TestCase):
         optimizer = optim.Adam(model.parameters(), lr=c.lr)
         for i in range(5):
             mel_out, mel_postnet_out, align, stop_tokens = model.forward(
-                input, input_lengths, mel_spec)
+                input, input_lengths, mel_spec, speaker_ids)
             assert torch.sigmoid(stop_tokens).data.max() <= 1.0
             assert torch.sigmoid(stop_tokens).data.min() >= 0.0
             optimizer.zero_grad()
